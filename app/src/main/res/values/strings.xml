@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">Kontak</string>
+    <string name="fname">First name</string>
+    <string name="lname">Last name</string>
+    <string name="mobile">Mobile number</string>
+    <string name="email">Email address</string>
+</resources>

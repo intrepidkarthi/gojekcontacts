@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:fresco="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_margin="@dimen/activity_horizontal_margin"
+    android:layout_height="match_parent">
+
+    <com.facebook.drawee.view.SimpleDraweeView
+        android:id="@+id/avatar"
+        android:layout_width="@dimen/avatar_size"
+        android:layout_height="@dimen/avatar_size"
+        android:layout_gravity="center"
+        android:layout_centerHorizontal="true"
+        android:background="@color/colorPrimary"
+        fresco:placeholderImageScaleType="fitXY"
+        fresco:placeholderImage="@drawable/ic_person_24dp"
+        fresco:failureImage="@drawable/ic_person_24dp"
+        fresco:roundAsCircle="true"
+        android:scaleType="centerInside"
+        fresco:roundedCornerRadius="20dp"
+        fresco:roundBottomLeft="true"
+        fresco:roundBottomRight="true"
+        fresco:roundWithOverlayColor="@color/colorPrimary"
+        fresco:roundingBorderWidth="1dp"
+        fresco:roundingBorderColor="@color/colorAccent"/>
+
+    <android.support.v7.widget.AppCompatEditText
+        android:id="@+id/firstname"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_margin="@dimen/spacing"
+        android:hint="@string/fname"
+        android:textSize="@dimen/text_size_details_page"
+        android:backgroundTint="@color/grey"
+        android:textColor="@color/grey" />
+
+    <android.support.v7.widget.AppCompatEditText
+        android:id="@+id/lastname"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_margin="@dimen/spacing"
+        android:hint="@string/lname"
+        android:textSize="@dimen/text_size_details_page"
+        android:backgroundTint="@color/grey"
+        android:textColor="@color/grey" />
+
+    <android.support.v7.widget.AppCompatEditText
+        android:id="@+id/mobilenumber"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_margin="@dimen/spacing"
+        android:hint="@string/mobile"
+        android:textSize="@dimen/text_size_details_page"
+        android:backgroundTint="@color/grey"
+        android:textColor="@color/grey" />
+
+    <android.support.v7.widget.AppCompatEditText
+        android:id="@+id/emailaddress"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_margin="@dimen/spacing"
+        android:hint="@string/email"
+        android:textSize="@dimen/text_size_details_page"
+        android:backgroundTint="@color/grey"
+        android:textColor="@color/grey" />
+
+    <android.support.v7.widget.AppCompatButton
+        android:id="@+id/savebutton"
+        android:layout_width="wrap_content"
+        android:textColor="@android:color/white"
+        android:layout_marginRight="10dp"
+        android:layout_gravity="right"
+        android:textSize="@dimen/text_size_details_page"
+        android:background="@color/colorAccent"
+        android:text="SAVE"
+        android:layout_height="wrap_content" />
+
+
+
+</LinearLayout>
