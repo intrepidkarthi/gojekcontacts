@@ -26,7 +26,7 @@ import retrofit2.Response;
 
 public class DetailActivity extends AppCompatActivity {
 
-    private int userId;
+    private long userId;
     @BindView(R.id.avatar)
     SimpleDraweeView userImage;
     @BindView(R.id.name)
@@ -44,14 +44,14 @@ public class DetailActivity extends AppCompatActivity {
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        userId = getIntent().getIntExtra("id", 1);
+        userId = getIntent().getLongExtra("id", 1);
 
 
         //Get Individual contact
         KontakAPIInterface kontakAPIInterface =
                 KontakFactory.getClient().create(KontakAPIInterface.class);
 
-        Call<Contact> getContactCall = kontakAPIInterface.getContact(userId);
+        Call<Contact> getContactCall = kontakAPIInterface.getContact((int)userId);
         getContactCall.enqueue(new Callback<Contact>() {
             @Override
             public void onResponse(Call<Contact> call, Response<Contact> response) {
