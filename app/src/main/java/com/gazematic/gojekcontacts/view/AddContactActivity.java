@@ -2,24 +2,41 @@ package com.gazematic.gojekcontacts.view;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.AppCompatButton;
+import android.support.v7.widget.AppCompatEditText;
 import android.util.Log;
 
+import com.facebook.drawee.view.SimpleDraweeView;
 import com.gazematic.gojekcontacts.R;
 import com.gazematic.gojekcontacts.data.KontakAPIInterface;
 import com.gazematic.gojekcontacts.data.KontakFactory;
 import com.gazematic.gojekcontacts.model.Contact;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
 public class AddContactActivity extends AppCompatActivity {
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_add_contact);
+    @BindView(R.id.avatar)
+    SimpleDraweeView userImage;
+    @BindView(R.id.firstname)
+    AppCompatEditText userFirstName;
+    @BindView(R.id.lastname)
+    AppCompatEditText userLastName;
+    @BindView(R.id.emailaddress)
+    AppCompatEditText userEmailAddress;
+    @BindView(R.id.mobilenumber)
+    AppCompatEditText userPhoneNumber;
+    @BindView(R.id.savebutton)
+    AppCompatButton userDataSaveButton;
 
+    @OnClick(R.id.savebutton)
+    public void saveData(AppCompatButton button)
+    {
         //Add individual contact
         KontakAPIInterface kontakAPIInterface =
                 KontakFactory.getClient().create(KontakAPIInterface.class);
@@ -38,5 +55,16 @@ public class AddContactActivity extends AppCompatActivity {
                 Log.v("Kontak", "getContactCall failure response: " + t.toString());
             }
         });
+    }
+
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_add_contact);
+        ButterKnife.bind(this);
+
+
+
     }
 }

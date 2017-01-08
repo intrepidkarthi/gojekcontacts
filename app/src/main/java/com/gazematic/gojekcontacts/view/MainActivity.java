@@ -3,9 +3,13 @@ package com.gazematic.gojekcontacts.view;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -45,6 +49,10 @@ public class MainActivity extends AppCompatActivity {
         mInflater = LayoutInflater.from(MainActivity.this);
         setContentView(R.layout.activity_main);
 
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
+
         KontakAPIInterface kontakAPIInterface =
                 KontakFactory.getClient().create(KontakAPIInterface.class);
 
@@ -78,6 +86,31 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+//    @Override
+//    public void onPrepareOptionsMenu(Menu menu) {
+//        menu.findItem(R.id.action_newItem).setVisible(true);
+//        super.onPrepareOptionsMenu(menu);
+//    }
+
+    public boolean onCreateOptionsMenu(Menu menu) {
+
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu, menu);
+        return true;
+    }
+
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        //respond to menu item selection
+        switch (item.getItemId()) {
+            case R.id.add_new:
+                startActivity(new Intent(this, AddContactActivity.class));
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+
+    }
 
     void setContactsList()
     {
