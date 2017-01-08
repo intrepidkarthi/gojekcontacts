@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.AppCompatTextView;
@@ -53,6 +54,8 @@ public class MainActivity extends AppCompatActivity {
     @BindView(R.id.no_contacts)
     AppCompatTextView noContacts;
     DatabaseHelper helper;
+    @BindView(R.id.layout_view)
+    CoordinatorLayout coordinatorLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,7 +82,7 @@ public class MainActivity extends AppCompatActivity {
 
 
         if(!isConnected)
-            Snackbar.make(listView, "Not able to connect to Server", Snackbar.LENGTH_SHORT).show();
+            Snackbar.make(coordinatorLayout, "Not able to connect to Server", Snackbar.LENGTH_SHORT).show();
 
 
         Log.v("Kontak", "DB fetching event: " +helper.getCount(Contact.class));
