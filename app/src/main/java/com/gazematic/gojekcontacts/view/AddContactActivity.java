@@ -11,6 +11,10 @@ import com.gazematic.gojekcontacts.R;
 import com.gazematic.gojekcontacts.data.KontakAPIInterface;
 import com.gazematic.gojekcontacts.data.KontakFactory;
 import com.gazematic.gojekcontacts.model.Contact;
+import com.vansuita.pickimage.PickImageDialog;
+import com.vansuita.pickimage.PickSetup;
+import com.vansuita.pickimage.bean.PickResult;
+import com.vansuita.pickimage.listeners.IPickResult;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -19,7 +23,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class AddContactActivity extends AppCompatActivity {
+public class AddContactActivity extends AppCompatActivity implements IPickResult {
 
     @BindView(R.id.avatar)
     SimpleDraweeView userImage;
@@ -33,6 +37,13 @@ public class AddContactActivity extends AppCompatActivity {
     AppCompatEditText userPhoneNumber;
     @BindView(R.id.savebutton)
     AppCompatButton userDataSaveButton;
+
+    @OnClick(R.id.avatar)
+    public void selectImage(SimpleDraweeView image)
+    {
+        PickImageDialog.on(AddContactActivity.this, new PickSetup());
+
+    }
 
     @OnClick(R.id.savebutton)
     public void saveData(AppCompatButton button)
@@ -63,8 +74,22 @@ public class AddContactActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_contact);
         ButterKnife.bind(this);
-
-
-
     }
+
+
+    @Override
+    public void onPickResult(PickResult r) {
+        if (r.getError() == null) {
+            //If you want the Uri.
+            //Mandatory to refresh image from Uri.
+            userImage.setImageURI(null);
+
+            //Setting the real returned image.
+            userImage.setImageURI(r.getUri());
+        } else {
+            //Handle possible errors
+            //TODO: do what you have to do with r.getError();
+        }
+    }
+
 }
