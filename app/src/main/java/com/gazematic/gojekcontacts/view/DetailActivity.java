@@ -1,5 +1,6 @@
 package com.gazematic.gojekcontacts.view;
 
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.NavUtils;
@@ -114,6 +115,13 @@ public class DetailActivity extends AppCompatActivity {
                 Log.v("Kontak", "getContactCall failure response: " + t.toString());
             }
         });
+
+
+
+        //Callphone directly
+        Intent intent = new Intent(Intent.ACTION_CALL);
+        intent.setData(Uri.parse("tel:09999"));
+       // startActivity(intent);
 
     }
 

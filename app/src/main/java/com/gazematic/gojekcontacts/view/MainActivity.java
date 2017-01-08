@@ -8,7 +8,6 @@ import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.AppCompatTextView;
-import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -28,8 +27,6 @@ import com.gazematic.gojekcontacts.utils.CircularContactView;
 import com.gazematic.gojekcontacts.utils.PinnedHeaderListView;
 import com.gazematic.gojekcontacts.utils.SearchablePinnedHeaderListViewAdapter;
 import com.gazematic.gojekcontacts.utils.StringArrayAlphabetIndexer;
-
-import net.redwarp.library.database.DatabaseHelper;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -61,8 +58,8 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+        //Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        //setSupportActionBar(toolbar);
 
         //Check Network connection
         //This is faster than checking through HTTP socket in Retrofit
@@ -173,19 +170,21 @@ public class MainActivity extends AppCompatActivity {
                 }
                 else {
 
-                    //Storing in DB
-                    DatabaseHelper helper = new DatabaseHelper(getApplicationContext());
-                    helper.beginTransaction();
-                    for (Contact myContact : response.body())
-                        helper.save(myContact);
-                    helper.setTransactionSuccessful();
-                    helper.endTransaction();
 
 
                     //Retrieving from DB
-                    List<Contact> myContacts = helper.getAll(Contact.class);
-                    contacts = new ArrayList<>((int) helper.getCount(Contact.class));
-                    contacts.addAll(myContacts);
+                    //List<Contact> myContacts = helper.getAll(Contact.class);
+                    contacts = new ArrayList<>(response.body().size());
+                    contacts.addAll(response.body());
+
+                    //Storing in DB
+//                    DatabaseHelper helper = new DatabaseHelper(getApplicationContext());
+//                    helper.beginTransaction();
+//                    for (Contact myContact : contacts)
+//                        helper.save(myContact);
+//                    helper.setTransactionSuccessful();
+//                    helper.endTransaction();
+
 
 
                     Log.v("Kontak", "I test response: " + contacts.get(0).getFirstName());
