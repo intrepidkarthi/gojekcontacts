@@ -34,6 +34,17 @@
         android:scrollingCache="false"
         tools:listitem="@layout/contact_listview_item" />
 
+    <android.support.v7.widget.AppCompatTextView
+        android:id="@+id/no_contacts"
+        android:visibility="invisible"
+        android:layout_width="wrap_content"
+        android:drawableLeft="@android:drawable/ic_menu_search"
+        android:text="No contact found"
+        android:textColor="@color/grey"
+        android:textSize="@dimen/text_size_details_page"
+        android:layout_gravity="center"
+        android:layout_height="wrap_content" />
+
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fab"
         android:layout_width="wrap_content"

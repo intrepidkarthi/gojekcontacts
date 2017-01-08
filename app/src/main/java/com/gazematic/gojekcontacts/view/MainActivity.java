@@ -1,8 +1,13 @@
 package com.gazematic.gojekcontacts.view;
 
+import android.content.Context;
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.AppCompatTextView;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.util.Log;
@@ -24,12 +29,16 @@ import com.gazematic.gojekcontacts.utils.PinnedHeaderListView;
 import com.gazematic.gojekcontacts.utils.SearchablePinnedHeaderListViewAdapter;
 import com.gazematic.gojekcontacts.utils.StringArrayAlphabetIndexer;
 
+import net.redwarp.library.database.DatabaseHelper;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -38,42 +47,38 @@ import static android.R.id.list;
 
 public class MainActivity extends AppCompatActivity {
 
-    private LayoutInflater mInflater;
-    private PinnedHeaderListView mListView;
-    private ContactsAdapter mAdapter;
+    private LayoutInflater inflater;
+    private PinnedHeaderListView listView;
+    private ContactsAdapter contactsAdapter;
     private ArrayList<Contact> contacts;
+    @BindView(R.id.no_contacts)
+    AppCompatTextView noContacts;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mInflater = LayoutInflater.from(MainActivity.this);
+        inflater = LayoutInflater.from(MainActivity.this);
         setContentView(R.layout.activity_main);
+        ButterKnife.bind(this);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        //Check Network connection
+        //This is faster than checking through HTTP socket in Retrofit
+        ConnectivityManager cm =
+                (ConnectivityManager)getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
 
-        KontakAPIInterface kontakAPIInterface =
-                KontakFactory.getClient().create(KontakAPIInterface.class);
+        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+        boolean isConnected = activeNetwork != null &&
+                activeNetwork.isConnectedOrConnecting();
 
-        //Get all contacts
-        Call<List<Contact>> getContactsCall = kontakAPIInterface.getContactsList();
-        getContactsCall.enqueue(new Callback<List<Contact>>() {
-            @Override
-            public void onResponse(Call<List<Contact>> call, Response<List<Contact>> response) {
-                Log.v("Kontak", "getContactsCall response: " + response.body());
-                contacts = new ArrayList<>(response.body().size());
-                contacts.addAll(response.body());
-                Log.v("Kontak", "I test response: " + contacts.get(0).getFirstName());
-                //contacts = new ArrayList<Contact>(response.body());
-                setContactsList();
-            }
 
-            @Override
-            public void onFailure(Call<List<Contact>> call, Throwable t) {
-                Log.v("Kontak", "getContactsCall failure response: " + t.toString());
-            }
-        });
+        if(isConnected)
+            makeAPICall();
+        else
+            Snackbar.make(listView, "Not able to connect to Server", Snackbar.LENGTH_SHORT).show();
+
 
 
 
@@ -86,11 +91,6 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-//    @Override
-//    public void onPrepareOptionsMenu(Menu menu) {
-//        menu.findItem(R.id.action_newItem).setVisible(true);
-//        super.onPrepareOptionsMenu(menu);
-//    }
 
     public boolean onCreateOptionsMenu(Menu menu) {
 
@@ -126,16 +126,16 @@ public class MainActivity extends AppCompatActivity {
                 return firstLetterComparison;
             }
         });
-        mListView = (PinnedHeaderListView) findViewById(list);
-        mAdapter = new ContactsAdapter(contacts);
+        listView = (PinnedHeaderListView) findViewById(list);
+        contactsAdapter = new ContactsAdapter(contacts);
 
         int pinnedHeaderBackgroundColor = getResources().getColor(R.color.pinned_header_text_bg);
-        mAdapter.setPinnedHeaderBackgroundColor(pinnedHeaderBackgroundColor);
-        mAdapter.setPinnedHeaderTextColor(getResources().getColor(R.color.pinned_header_text));
-        mListView.setPinnedHeaderView(mInflater.inflate(R.layout.pinned_header_listview_side_header, mListView, false));
-        mListView.setAdapter(mAdapter);
-        mListView.setOnScrollListener(mAdapter);
-        mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        contactsAdapter.setPinnedHeaderBackgroundColor(pinnedHeaderBackgroundColor);
+        contactsAdapter.setPinnedHeaderTextColor(getResources().getColor(R.color.pinned_header_text));
+        listView.setPinnedHeaderView(inflater.inflate(R.layout.pinned_header_listview_side_header, listView, false));
+        listView.setAdapter(contactsAdapter);
+        listView.setOnScrollListener(contactsAdapter);
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 Intent intent = new Intent(getApplicationContext(), DetailActivity.class);
@@ -147,12 +147,60 @@ public class MainActivity extends AppCompatActivity {
 
 
 
+
     }
 
 
 
 
+    public void makeAPICall()
+    {
+        KontakAPIInterface kontakAPIInterface =
+                KontakFactory.getClient().create(KontakAPIInterface.class);
 
+        //Get all contacts
+        Call<List<Contact>> getContactsCall = kontakAPIInterface.getContactsList();
+        getContactsCall.enqueue(new Callback<List<Contact>>() {
+            @Override
+            public void onResponse(Call<List<Contact>> call, Response<List<Contact>> response) {
+                Log.v("Kontak", "getContactsCall response: " + response.body());
+
+
+                if(response.body().size() == 0)
+                {
+                    listView.setVisibility(View.INVISIBLE);
+                    noContacts.setVisibility(View.VISIBLE);
+                }
+                else {
+
+                    //Storing in DB
+                    DatabaseHelper helper = new DatabaseHelper(getApplicationContext());
+                    helper.beginTransaction();
+                    for (Contact myContact : response.body())
+                        helper.save(myContact);
+                    helper.setTransactionSuccessful();
+                    helper.endTransaction();
+
+
+                    //Retrieving from DB
+                    List<Contact> myContacts = helper.getAll(Contact.class);
+                    contacts = new ArrayList<>((int) helper.getCount(Contact.class));
+                    contacts.addAll(myContacts);
+
+
+                    Log.v("Kontak", "I test response: " + contacts.get(0).getFirstName());
+                    //contacts = new ArrayList<Contact>(response.body());
+                    setContactsList();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<List<Contact>> call, Throwable t) {
+                Log.v("Kontak", "getContactsCall failure response: " + t.toString());
+            }
+        });
+
+    }
 
 
 
@@ -211,7 +259,7 @@ public class MainActivity extends AppCompatActivity {
             final View rootView;
             if (convertView == null) {
                 holder = new ViewHolder();
-                rootView = mInflater.inflate(R.layout.contact_listview_item, parent, false);
+                rootView = inflater.inflate(R.layout.contact_listview_item, parent, false);
                 holder.friendProfileCircularContactView = (CircularContactView) rootView
                         .findViewById(R.id.listview_item__friendPhotoImageView);
                 holder.friendProfileCircularContactView.getTextView().setTextColor(0xFFffffff);

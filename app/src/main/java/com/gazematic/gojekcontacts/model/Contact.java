@@ -7,8 +7,11 @@ package com.gazematic.gojekcontacts.model;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
+import net.redwarp.library.database.annotation.PrimaryKey;
+
 public class Contact {
 
+    @PrimaryKey
     @SerializedName("id")
     @Expose
     private Integer id;
@@ -37,6 +40,7 @@ public class Contact {
     @Expose
     private String updatedAt;
 
+    public Contact(){}
 
     public Contact(Integer id, String firstName, String lastName, String email, String phoneNumber, String profilePic, Boolean favorite, String createdAt, String updatedAt) {
         this.id = id;
