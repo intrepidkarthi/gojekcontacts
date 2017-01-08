@@ -12,6 +12,7 @@ import net.redwarp.library.database.annotation.PrimaryKey;
 public class Contact {
 
     @PrimaryKey
+    public long key;
     @SerializedName("id")
     @Expose
     private long id;
