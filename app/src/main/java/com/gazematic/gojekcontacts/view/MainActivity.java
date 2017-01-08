@@ -28,6 +28,8 @@ import com.gazematic.gojekcontacts.utils.PinnedHeaderListView;
 import com.gazematic.gojekcontacts.utils.SearchablePinnedHeaderListViewAdapter;
 import com.gazematic.gojekcontacts.utils.StringArrayAlphabetIndexer;
 
+import net.redwarp.library.database.DatabaseHelper;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -178,12 +180,12 @@ public class MainActivity extends AppCompatActivity {
                     contacts.addAll(response.body());
 
                     //Storing in DB
-//                    DatabaseHelper helper = new DatabaseHelper(getApplicationContext());
-//                    helper.beginTransaction();
-//                    for (Contact myContact : contacts)
-//                        helper.save(myContact);
-//                    helper.setTransactionSuccessful();
-//                    helper.endTransaction();
+                    DatabaseHelper helper = new DatabaseHelper(getApplicationContext());
+                    helper.beginTransaction();
+                    for (Contact myContact : contacts)
+                        helper.save(myContact);
+                    helper.setTransactionSuccessful();
+                    helper.endTransaction();
 
 
 

@@ -14,7 +14,7 @@ public class Contact {
     @PrimaryKey
     @SerializedName("id")
     @Expose
-    private Integer id;
+    private long id;
     @SerializedName("first_name")
     @Expose
     private String firstName;
@@ -42,7 +42,7 @@ public class Contact {
 
     public Contact(){}
 
-    public Contact(Integer id, String firstName, String lastName, String email, String phoneNumber, String profilePic, Boolean favorite, String createdAt, String updatedAt) {
+    public Contact(long id, String firstName, String lastName, String email, String phoneNumber, String profilePic, Boolean favorite, String createdAt, String updatedAt) {
         this.id = id;
         this.firstName = firstName;
         this.lastName = lastName;
@@ -65,11 +65,11 @@ public class Contact {
         this.updatedAt = updatedAt;
     }
 
-    public Integer getId() {
+    public long getId() {
         return id;
     }
 
-    public void setId(Integer id) {
+    public void setId(long id) {
         this.id = id;
     }
 
