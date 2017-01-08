@@ -60,9 +60,10 @@ public class MainActivity extends AppCompatActivity {
         inflater = LayoutInflater.from(MainActivity.this);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
+        
 
-//        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-//        setSupportActionBar(toolbar);
+        //Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        //setSupportActionBar(toolbar);
 
         //Check Network connection
         //This is faster than checking through HTTP socket in Retrofit
@@ -91,13 +92,14 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
 
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu, menu);
         return true;
     }
+
 
     public boolean onOptionsItemSelected(MenuItem item) {
 

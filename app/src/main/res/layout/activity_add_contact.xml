@@ -11,7 +11,6 @@
         android:layout_height="@dimen/avatar_size"
         android:layout_gravity="center"
         android:layout_centerHorizontal="true"
-        android:background="@color/colorPrimary"
         fresco:placeholderImageScaleType="fitXY"
         fresco:placeholderImage="@drawable/ic_person_24dp"
         fresco:failureImage="@drawable/ic_person_24dp"
@@ -20,7 +19,6 @@
         fresco:roundedCornerRadius="20dp"
         fresco:roundBottomLeft="true"
         fresco:roundBottomRight="true"
-        fresco:roundWithOverlayColor="@color/colorPrimary"
         fresco:roundingBorderWidth="1dp"
         fresco:roundingBorderColor="@color/colorAccent"/>
 
