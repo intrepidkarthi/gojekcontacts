@@ -5,4 +5,8 @@
     <string name="mobile">Mobile number</string>
     <string name="email">Email address</string>
     <string name="title_activity_temp">TempActivity</string>
+    <string-array name="sharecontact">
+        <item>Share as a Text</item>
+        <item>Share as a Contact</item>
+    </string-array>
 </resources>
