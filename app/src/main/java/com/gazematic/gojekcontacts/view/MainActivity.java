@@ -57,6 +57,8 @@ public class MainActivity extends AppCompatActivity {
     @BindView(R.id.layout_view)
     CoordinatorLayout coordinatorLayout;
 
+    private MainActivityBinding mainActivityBinding;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
