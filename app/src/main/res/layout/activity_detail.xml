@@ -51,6 +51,7 @@
             android:layout_gravity="center"
             android:layout_margin="@dimen/spacing"
             android:clickable="true"
+            android:onClick="@{contactDetailViewModel.onClickPhone}"
             android:drawableLeft="@drawable/ic_call_black_24dp"
             android:drawablePadding="@dimen/spacing"
             android:text="@{contactDetailViewModel.phoneNumber}"
@@ -66,6 +67,7 @@
             android:layout_gravity="center"
             android:layout_margin="@dimen/spacing"
             android:clickable="true"
+            android:onClick="@{contactDetailViewModel.onClickEmail}"
             android:drawableLeft="@drawable/ic_email_black_24dp"
             android:drawablePadding="@dimen/spacing"
             android:text="@{contactDetailViewModel.email}"
@@ -74,10 +76,22 @@
             android:textSize="@dimen/text_size_details_page" />
 
         <android.support.v7.widget.AppCompatButton
+            android:id="@+id/favorite"
+            android:layout_width="150dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:onClick="@{contactDetailViewModel.onClickFavorite}"
+            android:textColor="@android:color/white"
+            android:layout_margin="10dp"
+            android:background="@color/colorAccent"
+            android:text="Favorite" />
+
+        <android.support.v7.widget.AppCompatButton
             android:id="@+id/sms"
             android:layout_width="150dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
+            android:onClick="@{contactDetailViewModel.onClickSMS}"
             android:textColor="@android:color/white"
             android:layout_margin="10dp"
             android:background="@color/colorAccent"
@@ -86,6 +100,7 @@
         <android.support.v7.widget.AppCompatButton
             android:id="@+id/share"
             android:layout_width="150dp"
+            android:onClick="@{contactDetailViewModel.onClickShare}"
             android:layout_height="wrap_content"
             android:textColor="@android:color/white"
             android:layout_gravity="center"

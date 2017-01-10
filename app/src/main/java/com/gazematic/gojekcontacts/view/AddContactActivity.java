@@ -24,16 +24,7 @@ public class AddContactActivity extends AppCompatActivity implements IPickResult
 
     @BindView(R.id.avatar)
     SimpleDraweeView userImage;
-//    @BindView(R.id.firstname)
-//    AppCompatEditText userFirstName;
-//    @BindView(R.id.lastname)
-//    AppCompatEditText userLastName;
-//    @BindView(R.id.emailaddress)
-//    AppCompatEditText userEmailAddress;
-//    @BindView(R.id.mobilenumber)
-//    AppCompatEditText userPhoneNumber;
-//    @BindView(R.id.savebutton)
-//    AppCompatButton userDataSaveButton;
+
 
 
     AddContactViewModel addContactViewModel;
