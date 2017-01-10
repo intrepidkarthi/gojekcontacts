@@ -6,7 +6,7 @@ import java.util.ArrayList;
  * Created by Karthi on 1/6/2017.
  */
 
-public class ContactsList {
+public class ContactsList  {
 
     private ArrayList<Contact> contactList = new ArrayList<Contact>();
 

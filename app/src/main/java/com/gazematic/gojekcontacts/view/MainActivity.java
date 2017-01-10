@@ -57,7 +57,7 @@ public class MainActivity extends AppCompatActivity {
     @BindView(R.id.layout_view)
     CoordinatorLayout coordinatorLayout;
 
-    private MainActivityBinding mainActivityBinding;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -94,7 +94,7 @@ public class MainActivity extends AppCompatActivity {
 
             List<Contact> allContacts = helper.getAll(Contact.class);
             for(int i=0; i<allContacts.size();i++) {
-                Log.v("Kontak", "DB fetching event: counter" +allContacts.get(i).getFirstName());
+                //Log.v("Kontak", "DB fetching event: counter" +allContacts.get(i).getFirstName());
                 contacts = new ArrayList<>(allContacts.size());
                 contacts.addAll(allContacts);
 

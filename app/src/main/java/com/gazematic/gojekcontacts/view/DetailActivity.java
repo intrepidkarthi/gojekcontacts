@@ -1,18 +1,14 @@
 package com.gazematic.gojekcontacts.view;
 
 import android.Manifest;
-import android.app.Dialog;
-import android.content.Context;
-import android.content.ContextWrapper;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.databinding.DataBindingUtil;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
-import android.provider.ContactsContract;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.DialogFragment;
 import android.support.v4.app.NavUtils;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -21,18 +17,18 @@ import android.support.v7.widget.AppCompatTextView;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageView;
 
-import com.facebook.drawee.view.SimpleDraweeView;
 import com.gazematic.gojekcontacts.R;
 import com.gazematic.gojekcontacts.data.KontakAPIInterface;
 import com.gazematic.gojekcontacts.data.KontakFactory;
+import com.gazematic.gojekcontacts.databinding.ActivityDetailBinding;
 import com.gazematic.gojekcontacts.model.Contact;
+import com.gazematic.gojekcontacts.viewmodel.ContactDetailViewModel;
 
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -46,9 +42,9 @@ public class DetailActivity extends AppCompatActivity {
     final int MY_PERMISSION_REQ_STORAGE = 2;
 
     private long userId;
-    private Contact mContact;
+    private Contact contact;
     @BindView(R.id.avatar)
-    SimpleDraweeView userImage;
+    ImageView userImage;
     @BindView(R.id.name)
     AppCompatTextView userName;
     @BindView(R.id.phone)
@@ -60,16 +56,21 @@ public class DetailActivity extends AppCompatActivity {
     @BindView(R.id.share)
     AppCompatButton shareContactButton;
 
+    ContactDetailViewModel contactDetailViewModel;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_detail);
+
+        final ActivityDetailBinding activityDetailBinding = DataBindingUtil.setContentView(this, R.layout.activity_detail);
+
+        //setContentView(R.layout.activity_detail);
         ButterKnife.bind(this);
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         userId = getIntent().getLongExtra("id", 1);
-        mContact = new Contact();
+
 
 
         //Get Individual contact
@@ -80,55 +81,41 @@ public class DetailActivity extends AppCompatActivity {
         getContactCall.enqueue(new Callback<Contact>() {
             @Override
             public void onResponse(Call<Contact> call, Response<Contact> response) {
-                Log.v("Kontak", "getContactCall response: " + response.body().getFirstName());
-//                if(response.body().getProfilePic()!=null)
-//                    userImage.setImageURI(Uri.parse(response.body().getProfilePic()));
 
-//                if(response.body().getProfilePic() == null) throw new NullPointerException();
-//                else
-//                    userImage.setImageURI(Uri.parse(response.body().getProfilePic()));
-
+                contact = response.body();
+                //Log.v("Kontak", "getContactCall response: " + response.body().getFirstName());
+                contactDetailViewModel = new ContactDetailViewModel(contact);
+                activityDetailBinding.setContactDetailViewModel(contactDetailViewModel);
 
 //                try {
-//                    URL url = new URL(myURL);
-//                    String nullFragment = null;
-//                    URI uri = new URI(url.getProtocol(), url.getHost(), url.getPath(), url.getQuery(), nullFragment);
-//                    System.out.println("URI " + uri.toString() + " is OK");
-//                } catch (MalformedURLException e) {
-//                    System.out.println("URL " + myURL + " is a malformed URL");
-//                } catch (URISyntaxException e) {
-//                    System.out.println("URI " + myURL + " is a malformed URL");
+//                    mContact.setFirstName(myContact.getFirstName());
+//                    mContact.setLastName(response.body().getLastName());
+//                    userName.setText(response.body().getFirstName() + "  " + response.body().getLastName());
+//
+//                } catch (NullPointerException npe) {
+//
+//                }
+//
+//                try {
+//                    mContact.setPhoneNumber(response.body().getPhoneNumber());
+//                    userPhone.setText(response.body().getPhoneNumber());
+//                } catch (NullPointerException npe) {
+//
+//                }
+//
+//                try {
+//                    mContact.setEmail(response.body().getEmail().trim());
+//                    userEmail.setText(response.body().getEmail());
+//                } catch (NullPointerException npe) {
+//
 //                }
 
-                try {
-                    mContact.setFirstName(response.body().getFirstName());
-                    mContact.setLastName(response.body().getLastName());
-                    userName.setText(response.body().getFirstName() + "  " + response.body().getLastName());
-
-                } catch (NullPointerException npe) {
-
-                }
-
-                try {
-                    mContact.setPhoneNumber(response.body().getPhoneNumber());
-                    userPhone.setText(response.body().getPhoneNumber());
-                } catch (NullPointerException npe) {
-
-                }
-
-                try {
-                    mContact.setEmail(response.body().getEmail().trim());
-                    userEmail.setText(response.body().getEmail());
-                } catch (NullPointerException npe) {
-
-                }
-
-                try {
-                    URL url = new URL(response.body().getProfilePic());
-                    userImage.setImageURI(Uri.parse(response.body().getProfilePic()));
-                } catch (MalformedURLException mue) {
-                    mue.printStackTrace();
-                }
+//                try {
+//                    URL url = new URL(response.body().getProfilePic());
+//                    userImage.setImageURI(Uri.parse(response.body().getProfilePic()));
+//                } catch (MalformedURLException mue) {
+//                    mue.printStackTrace();
+//                }
             }
 
             @Override
@@ -143,7 +130,7 @@ public class DetailActivity extends AppCompatActivity {
             public void onClick(View view) {
                 //Callphone directly
                 Intent i = new Intent(Intent.ACTION_CALL);
-                i.setData(Uri.parse("tel:" + mContact.getPhoneNumber().trim()));
+                i.setData(Uri.parse("tel:" + contactDetailViewModel.getPhoneNumber().trim()));
                 if (ActivityCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
                     ActivityCompat.requestPermissions( DetailActivity.this, new String[]{Manifest.permission.CALL_PHONE}, MY_PERMISSION_REQ_CALL);
                     return;
@@ -157,7 +144,7 @@ public class DetailActivity extends AppCompatActivity {
             public void onClick(View view) {
                 Intent i = new Intent(Intent.ACTION_SEND);
                 i.setType("message/rfc822");
-                i.putExtra(Intent.EXTRA_EMAIL, new String[]{mContact.getEmail()});
+                i.putExtra(Intent.EXTRA_EMAIL, new String[]{contactDetailViewModel.getEmail()});
                 try {
                     startActivity(Intent.createChooser(i, "Send mail..."));
                 } catch (android.content.ActivityNotFoundException ex) {
@@ -170,7 +157,7 @@ public class DetailActivity extends AppCompatActivity {
         sendSMSButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent i = new Intent(Intent.ACTION_SENDTO,Uri.parse("smsto:"+mContact.getPhoneNumber()));
+                Intent i = new Intent(Intent.ACTION_SENDTO,Uri.parse("smsto:"+contactDetailViewModel.getPhoneNumber()));
                 startActivity(i);
             }
         });
@@ -186,11 +173,11 @@ public class DetailActivity extends AppCompatActivity {
                                 switch (which){
                                     case 0:
                                         //via SMS
-                                        shareAsSMS(mContact);
+                                        shareAsSMS();
                                         break;
                                     case 1:
                                         //via vCard
-                                        shareAsVCF(mContact);
+                                        shareAsVCF();
                                         break;
                                 }
                             }
@@ -201,19 +188,19 @@ public class DetailActivity extends AppCompatActivity {
 
     }
 
-    private void shareAsSMS(Contact mContact){
+    private void shareAsSMS(){
 
         Intent i = new Intent();
         i.setAction(Intent.ACTION_SENDTO );
         i.setData(Uri.parse("smsto:"));
-        i.putExtra("sms_body", "Name: " + mContact.getFirstName() + " " + mContact.getLastName() + " \n" +
-                                "Phone Number: " + mContact.getPhoneNumber() + " \n" +
-                                "Email: " + mContact.getEmail() + "\n");
+        i.putExtra("sms_body", "Name: " + contactDetailViewModel.getFirstName() + " " + contactDetailViewModel.getLastName() + " \n" +
+                                "Phone Number: " + contactDetailViewModel.getPhoneNumber() + " \n" +
+                                "Email: " + contactDetailViewModel.getEmail() + "\n");
         startActivity(i);
 
     }
 
-    private void shareAsVCF(Contact mContact){
+    private void shareAsVCF(){
         
         if (ActivityCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
             // We don't have permission so prompt the user
@@ -225,7 +212,7 @@ public class DetailActivity extends AppCompatActivity {
             return;
         }
 
-        File vcfFile = generateVCF(mContact);
+        File vcfFile = generateVCF();
 
         Intent i = new Intent();
         i.setAction(Intent.ACTION_SEND);
@@ -234,7 +221,7 @@ public class DetailActivity extends AppCompatActivity {
         startActivity(i);
     }
 
-    private File generateVCF(Contact mContact){
+    private File generateVCF(){
 
         //Create a vcf file
         String filename = new String(Environment.getExternalStorageDirectory()+"/generated.vcf");
@@ -246,10 +233,10 @@ public class DetailActivity extends AppCompatActivity {
             fw = new FileWriter(vcfFile);
             fw.write("BEGIN:VCARD\r\n");
             fw.write("VERSION:3.0\r\n");
-            fw.write("N:" + mContact.getLastName() + ";" + mContact.getFirstName() + "\r\n");
-            fw.write("FN:" + mContact.getFirstName() + " " + mContact.getLastName() + "\r\n");
-            fw.write("TEL;TYPE=HOME,VOICE:" + mContact.getPhoneNumber() + "\r\n");
-            fw.write("EMAIL;TYPE=PREF,INTERNET:" + mContact.getEmail() + "\r\n");
+            fw.write("N:" + contactDetailViewModel.getLastName() + ";" + contactDetailViewModel.getFirstName() + "\r\n");
+            fw.write("FN:" + contactDetailViewModel.getFirstName() + " " + contactDetailViewModel.getLastName() + "\r\n");
+            fw.write("TEL;TYPE=HOME,VOICE:" + contactDetailViewModel.getPhoneNumber() + "\r\n");
+            fw.write("EMAIL;TYPE=PREF,INTERNET:" + contactDetailViewModel.getEmail() + "\r\n");
             fw.write("END:VCARD\r\n");
             fw.close();
 
