@@ -4,12 +4,14 @@ package com.gazematic.gojekcontacts.model;
  * Created by Karthi on 1/6/2017.
  */
 
+import android.databinding.BaseObservable;
+
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
 import net.redwarp.library.database.annotation.PrimaryKey;
 
-public class Contact {
+public class Contact extends BaseObservable{
 
     @PrimaryKey
     public long key;
@@ -80,4 +82,6 @@ public class Contact {
     public long getId() {
         return id;
     }
+
+
 }

@@ -33,7 +33,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class KontakFactory {
 
-    public static final String BASE_URL = "http://gojek-contacts-app.herokuapp.com/";
+    private static final String BASE_URL = "http://gojek-contacts-app.herokuapp.com/";
     private static Retrofit retrofit = null;
 
 
@@ -60,5 +60,9 @@ public class KontakFactory {
                     .build();
         }
         return retrofit;
+    }
+
+    public static KontakAPIInterface create() {
+        return getClient().create(KontakAPIInterface.class);
     }
 }

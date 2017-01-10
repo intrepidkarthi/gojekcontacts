@@ -36,7 +36,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class DetailActivity extends AppCompatActivity {
+public class DetailActivity extends AppCompatActivity  {
 
     final int MY_PERMISSION_REQ_CALL = 1;
     final int MY_PERMISSION_REQ_STORAGE = 2;
@@ -55,6 +55,7 @@ public class DetailActivity extends AppCompatActivity {
     AppCompatButton sendSMSButton;
     @BindView(R.id.share)
     AppCompatButton shareContactButton;
+    ActivityDetailBinding activityDetailBinding;
 
     ContactDetailViewModel contactDetailViewModel;
 
@@ -62,7 +63,7 @@ public class DetailActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        final ActivityDetailBinding activityDetailBinding = DataBindingUtil.setContentView(this, R.layout.activity_detail);
+        activityDetailBinding = DataBindingUtil.setContentView(this, R.layout.activity_detail);
 
         //setContentView(R.layout.activity_detail);
         ButterKnife.bind(this);
@@ -87,35 +88,6 @@ public class DetailActivity extends AppCompatActivity {
                 contactDetailViewModel = new ContactDetailViewModel(contact);
                 activityDetailBinding.setContactDetailViewModel(contactDetailViewModel);
 
-//                try {
-//                    mContact.setFirstName(myContact.getFirstName());
-//                    mContact.setLastName(response.body().getLastName());
-//                    userName.setText(response.body().getFirstName() + "  " + response.body().getLastName());
-//
-//                } catch (NullPointerException npe) {
-//
-//                }
-//
-//                try {
-//                    mContact.setPhoneNumber(response.body().getPhoneNumber());
-//                    userPhone.setText(response.body().getPhoneNumber());
-//                } catch (NullPointerException npe) {
-//
-//                }
-//
-//                try {
-//                    mContact.setEmail(response.body().getEmail().trim());
-//                    userEmail.setText(response.body().getEmail());
-//                } catch (NullPointerException npe) {
-//
-//                }
-
-//                try {
-//                    URL url = new URL(response.body().getProfilePic());
-//                    userImage.setImageURI(Uri.parse(response.body().getProfilePic()));
-//                } catch (MalformedURLException mue) {
-//                    mue.printStackTrace();
-//                }
             }
 
             @Override
@@ -278,4 +250,6 @@ public class DetailActivity extends AppCompatActivity {
 
         }
     }
+
+
 }

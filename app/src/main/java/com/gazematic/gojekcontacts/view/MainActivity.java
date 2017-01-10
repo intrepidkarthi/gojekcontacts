@@ -1,12 +1,14 @@
 package com.gazematic.gojekcontacts.view;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.AppCompatTextView;
 import android.text.TextUtils;
@@ -58,7 +60,6 @@ public class MainActivity extends AppCompatActivity {
     CoordinatorLayout coordinatorLayout;
 
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -73,7 +74,7 @@ public class MainActivity extends AppCompatActivity {
         //Check Network connection
         //This is faster than checking through HTTP socket in Retrofit
         ConnectivityManager cm =
-                (ConnectivityManager)getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+                (ConnectivityManager) getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
 
         NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
         boolean isConnected = activeNetwork != null &&
@@ -83,36 +84,32 @@ public class MainActivity extends AppCompatActivity {
         helper = new DatabaseHelper(getApplicationContext());
 
 
-        if(!isConnected)
+        if (!isConnected)
             Snackbar.make(coordinatorLayout, "Not able to connect to Server", Snackbar.LENGTH_SHORT).show();
 
 
-        Log.v("Kontak", "DB fetching event: " +helper.getCount(Contact.class));
+        Log.v("Kontak", "DB fetching event: " + helper.getCount(Contact.class));
 
-        if(helper.getCount(Contact.class) > 0)
-        {
+        if (helper.getCount(Contact.class) > 0) {
 
             List<Contact> allContacts = helper.getAll(Contact.class);
-            for(int i=0; i<allContacts.size();i++) {
+            for (int i = 0; i < allContacts.size(); i++) {
                 //Log.v("Kontak", "DB fetching event: counter" +allContacts.get(i).getFirstName());
                 contacts = new ArrayList<>(allContacts.size());
                 contacts.addAll(allContacts);
 
                 setContactsList();
             }
+        } else {
+            if (isConnected)
+                makeAPICall();
+            else {
+                showRetryDialog();
+            }
         }
-        else
-            makeAPICall();
 
 
-
-
-
-
-
-
-
-        }
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -136,8 +133,31 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    void setContactsList()
-    {
+    public void showRetryDialog() {
+
+        final AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+        builder.setCancelable(false);
+        builder.setTitle("");
+        builder.setCancelable(true);
+        builder.setMessage("Do you want to retry?");
+        builder.setPositiveButton("Retry", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int id) {
+                makeAPICall();
+            }
+        })
+                .setNegativeButton("Cancel ", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                    }
+                });
+
+        // Create the AlertDialog object and return it
+        builder.create().show();
+    }
+
+    void setContactsList() {
         //final ArrayList<Contact> contacts = getContacts();
         Collections.sort(contacts, new Comparator<Contact>() {
             @Override
@@ -170,86 +190,56 @@ public class MainActivity extends AppCompatActivity {
         });
 
 
-
-
     }
 
 
-
-
-    public void makeAPICall()
-    {
+    public void makeAPICall() {
         KontakAPIInterface kontakAPIInterface =
                 KontakFactory.getClient().create(KontakAPIInterface.class);
-            //Get all contacts
-            Call<List<Contact>> getContactsCall = kontakAPIInterface.getContactsList();
-            getContactsCall.enqueue(new Callback<List<Contact>>() {
-                @Override
-                public void onResponse(Call<List<Contact>> call, Response<List<Contact>> response) {
-                    Log.v("Kontak", "getContactsCall response: " + response.body());
+        //Get all contacts
+        Call<List<Contact>> getContactsCall = kontakAPIInterface.getContactsList();
+        getContactsCall.enqueue(new Callback<List<Contact>>() {
+            @Override
+            public void onResponse(Call<List<Contact>> call, Response<List<Contact>> response) {
+                Log.v("Kontak", "getContactsCall response: " + response.body());
 
 
-                    if(response.body().size() == 0)
-                    {
-                        listView.setVisibility(View.INVISIBLE);
-                        noContacts.setVisibility(View.VISIBLE);
-                    }
-                    else {
+                if (response.body().size() == 0) {
+                    listView.setVisibility(View.INVISIBLE);
+                    noContacts.setVisibility(View.VISIBLE);
+                } else {
 
 
+                    //Retrieving from DB
+                    //List<Contact> myContacts = helper.getAll(Contact.class);
+                    contacts = new ArrayList<>(response.body().size());
+                    contacts.addAll(response.body());
 
-                        //Retrieving from DB
-                        //List<Contact> myContacts = helper.getAll(Contact.class);
-                        contacts = new ArrayList<>(response.body().size());
-                        contacts.addAll(response.body());
+                    helper.beginTransaction();
+                    for (int i = 0; i < contacts.size(); i++)
+                        helper.save(contacts.get(i));
+                    //for (Contact myContact : contacts)
+                    //  helper.save(myContact);
+                    helper.setTransactionSuccessful();
+                    helper.endTransaction();
 
-                        helper.beginTransaction();
-                        for(int i=0; i<contacts.size();i++)
-                            helper.save(contacts.get(i));
-                        //for (Contact myContact : contacts)
-                          //  helper.save(myContact);
-                        helper.setTransactionSuccessful();
-                        helper.endTransaction();
-
-                        Log.v("Kontak", "DB fetching event after insertion: " +helper.getCount(Contact.class));
-
+                    Log.v("Kontak", "DB fetching event after insertion: " + helper.getCount(Contact.class));
 
 
-                        Log.v("Kontak", "I test response: " + contacts.get(0).getFirstName());
-                        //contacts = new ArrayList<Contact>(response.body());
-                        setContactsList();
-                    }
+                    Log.v("Kontak", "I test response: " + contacts.get(0).getFirstName());
+                    //contacts = new ArrayList<Contact>(response.body());
+                    setContactsList();
                 }
+            }
 
-                @Override
-                public void onFailure(Call<List<Contact>> call, Throwable t) {
-                    Log.v("Kontak", "getContactsCall failure response: " + t.toString());
-                }
-            });
-
-
-
+            @Override
+            public void onFailure(Call<List<Contact>> call, Throwable t) {
+                Log.v("Kontak", "getContactsCall failure response: " + t.toString());
+            }
+        });
 
 
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
     private class ContactsAdapter extends SearchablePinnedHeaderListViewAdapter<Contact> {
@@ -312,15 +302,15 @@ public class MainActivity extends AppCompatActivity {
 //            if (cachedBitmap != null)
 //                holder.friendProfileCircularContactView.setImageBitmap(cachedBitmap);
 //            else {
-                final int backgroundColorToUse = PHOTO_TEXT_BACKGROUND_COLORS[position
-                        % PHOTO_TEXT_BACKGROUND_COLORS.length];
-                if (TextUtils.isEmpty(displayName))
-                    holder.friendProfileCircularContactView.setImageResource(R.drawable.ic_person_24dp,
-                            backgroundColorToUse);
-                else {
-                    final String characterToShow = TextUtils.isEmpty(displayName) ? "" : displayName.substring(0, 1).toUpperCase(Locale.getDefault());
-                    holder.friendProfileCircularContactView.setTextAndBackgroundColor(characterToShow, backgroundColorToUse);
-                }
+            final int backgroundColorToUse = PHOTO_TEXT_BACKGROUND_COLORS[position
+                    % PHOTO_TEXT_BACKGROUND_COLORS.length];
+            if (TextUtils.isEmpty(displayName))
+                holder.friendProfileCircularContactView.setImageResource(R.drawable.ic_person_24dp,
+                        backgroundColorToUse);
+            else {
+                final String characterToShow = TextUtils.isEmpty(displayName) ? "" : displayName.substring(0, 1).toUpperCase(Locale.getDefault());
+                holder.friendProfileCircularContactView.setTextAndBackgroundColor(characterToShow, backgroundColorToUse);
+            }
 //                if (hasPhoto) {
 //                    holder.updateTask = new AsyncTaskEx<Void, Void, Bitmap>() {
 //
@@ -364,8 +354,6 @@ public class MainActivity extends AppCompatActivity {
         public ArrayList<Contact> getOriginalList() {
             return mContacts;
         }
-
-
 
 
     }

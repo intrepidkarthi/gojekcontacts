@@ -1,16 +1,18 @@
 package com.gazematic.gojekcontacts.view;
 
+import android.content.Context;
+import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.AppCompatButton;
 import android.support.v7.widget.AppCompatEditText;
-import android.util.Log;
 
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.gazematic.gojekcontacts.R;
-import com.gazematic.gojekcontacts.data.KontakAPIInterface;
-import com.gazematic.gojekcontacts.data.KontakFactory;
+import com.gazematic.gojekcontacts.databinding.ActivityAddContactBinding;
 import com.gazematic.gojekcontacts.model.Contact;
+import com.gazematic.gojekcontacts.viewmodel.AddContactViewModel;
+import com.gazematic.gojekcontacts.viewmodel.AddContactViewModelContract;
 import com.vansuita.pickimage.PickImageDialog;
 import com.vansuita.pickimage.PickSetup;
 import com.vansuita.pickimage.bean.PickResult;
@@ -19,11 +21,8 @@ import com.vansuita.pickimage.listeners.IPickResult;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
-public class AddContactActivity extends AppCompatActivity implements IPickResult {
+public class AddContactActivity extends AppCompatActivity implements IPickResult, AddContactViewModelContract {
 
     @BindView(R.id.avatar)
     SimpleDraweeView userImage;
@@ -38,41 +37,25 @@ public class AddContactActivity extends AppCompatActivity implements IPickResult
     @BindView(R.id.savebutton)
     AppCompatButton userDataSaveButton;
 
+
+    AddContactViewModel addContactViewModel;
+    ActivityAddContactBinding activityAddContactBinding;
+
     @OnClick(R.id.avatar)
     public void selectImage(SimpleDraweeView image)
     {
         PickImageDialog.on(AddContactActivity.this, new PickSetup());
-
-    }
-
-    @OnClick(R.id.savebutton)
-    public void saveData(AppCompatButton button)
-    {
-        //Add individual contact
-        KontakAPIInterface kontakAPIInterface =
-                KontakFactory.getClient().create(KontakAPIInterface.class);
-
-        Contact myContact =  new Contact("Trish", "Karthik","trish@karthi.com", "9742381630","http://www.tvlap.com/images/trishaa.png", false, "2016-05-29T10:10:10.995Z", "2016-05-29T10:10:10.995Z" );
-
-        Call<Contact> setContactCall = kontakAPIInterface.setContactsList(myContact);
-        setContactCall.enqueue(new Callback<Contact>() {
-            @Override
-            public void onResponse(Call<Contact> call, Response<Contact> response) {
-                Log.v("Kontak", "getContactCall response: " + response.body());
-            }
-
-            @Override
-            public void onFailure(Call<Contact> call, Throwable t) {
-                Log.v("Kontak", "getContactCall failure response: " + t.toString());
-            }
-        });
     }
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_add_contact);
+        //Contact myContact =  new Contact("Trish", "Karthik","trish@karthi.com", "9742381630","http://www.tvlap.com/images/trishaa.png", false, "2016-05-29T10:10:10.995Z", "2016-05-29T10:10:10.995Z" );
+        Contact myContact =  new Contact();
+        activityAddContactBinding = DataBindingUtil.setContentView(this, R.layout.activity_add_contact);
+        addContactViewModel = new AddContactViewModel(getApplicationContext(), myContact );
+        activityAddContactBinding.setAddContactViewModel(addContactViewModel);
         ButterKnife.bind(this);
     }
 
@@ -88,8 +71,12 @@ public class AddContactActivity extends AppCompatActivity implements IPickResult
             userImage.setImageURI(r.getUri());
         } else {
             //Handle possible errors
-            //TODO: do what you have to do with r.getError();
+            //TODO:  r.getError();
         }
     }
 
+    @Override
+    public Context getContext() {
+        return AddContactActivity.this;
+    }
 }

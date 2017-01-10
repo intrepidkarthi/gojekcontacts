@@ -1,83 +1,103 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:fresco="http://schemas.android.com/apk/res-auto"
-    android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_margin="@dimen/activity_horizontal_margin"
-    android:layout_height="match_parent">
 
-    <com.facebook.drawee.view.SimpleDraweeView
-        android:id="@+id/avatar"
-        android:layout_width="@dimen/avatar_size"
-        android:layout_height="@dimen/avatar_size"
-        android:layout_gravity="center"
-        android:layout_centerHorizontal="true"
-        fresco:placeholderImageScaleType="fitXY"
-        fresco:placeholderImage="@drawable/ic_person_24dp"
-        fresco:failureImage="@drawable/ic_person_24dp"
-        fresco:roundAsCircle="true"
-        android:scaleType="centerInside"
-        fresco:roundedCornerRadius="20dp"
-        fresco:roundBottomLeft="true"
-        fresco:roundBottomRight="true"
-        fresco:roundingBorderWidth="1dp"
-        fresco:roundingBorderColor="@color/colorAccent"/>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:fresco="http://schemas.android.com/apk/res-auto">
 
-    <android.support.v7.widget.AppCompatEditText
-        android:id="@+id/firstname"
+    <data>
+        <variable
+            name="addContactViewModel"
+            type="com.gazematic.gojekcontacts.viewmodel.AddContactViewModel" />
+    </data>
+
+    <LinearLayout
+
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:layout_margin="@dimen/spacing"
-        android:hint="@string/fname"
-        android:textSize="@dimen/text_size_details_page"
-        android:backgroundTint="@color/grey"
-        android:textColor="@color/grey" />
+        android:layout_height="match_parent"
+        android:layout_margin="@dimen/activity_horizontal_margin"
+        android:orientation="vertical">
 
-    <android.support.v7.widget.AppCompatEditText
-        android:id="@+id/lastname"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:layout_margin="@dimen/spacing"
-        android:hint="@string/lname"
-        android:textSize="@dimen/text_size_details_page"
-        android:backgroundTint="@color/grey"
-        android:textColor="@color/grey" />
+        <com.facebook.drawee.view.SimpleDraweeView
+            android:id="@+id/avatar"
+            android:layout_width="@dimen/avatar_size"
+            android:layout_height="@dimen/avatar_size"
+            android:layout_centerHorizontal="true"
+            android:layout_gravity="center"
+            android:scaleType="centerInside"
+            fresco:failureImage="@drawable/ic_person_24dp"
+            fresco:placeholderImage="@drawable/ic_person_24dp"
+            fresco:placeholderImageScaleType="fitXY"
+            fresco:roundAsCircle="true"
+            fresco:roundBottomLeft="true"
+            fresco:roundBottomRight="true"
+            fresco:roundedCornerRadius="20dp"
+            fresco:roundingBorderColor="@color/colorAccent"
+            fresco:roundingBorderWidth="1dp" />
 
-    <android.support.v7.widget.AppCompatEditText
-        android:id="@+id/mobilenumber"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:layout_margin="@dimen/spacing"
-        android:autoLink="phone"
-        android:hint="@string/mobile"
-        android:textSize="@dimen/text_size_details_page"
-        android:backgroundTint="@color/grey"
-        android:textColor="@color/grey" />
+        <android.support.v7.widget.AppCompatEditText
+            android:id="@+id/firstname"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_margin="@dimen/spacing"
+            android:backgroundTint="@color/grey"
+            android:inputType="text"
+            android:hint="@string/fname"
+            android:text="@={addContactViewModel.firstName}"
+            android:textColor="@color/grey"
+            android:textSize="@dimen/text_size_details_page" />
 
-    <android.support.v7.widget.AppCompatEditText
-        android:id="@+id/emailaddress"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:layout_margin="@dimen/spacing"
-        android:hint="@string/email"
-        android:textSize="@dimen/text_size_details_page"
-        android:backgroundTint="@color/grey"
-        android:textColor="@color/grey" />
+        <android.support.v7.widget.AppCompatEditText
+            android:id="@+id/lastname"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_margin="@dimen/spacing"
+            android:inputType="text"
+            android:backgroundTint="@color/grey"
+            android:hint="@string/lname"
+            android:text="@={addContactViewModel.lastName}"
+            android:textColor="@color/grey"
+            android:textSize="@dimen/text_size_details_page" />
 
-    <android.support.v7.widget.AppCompatButton
-        android:id="@+id/savebutton"
-        android:layout_width="wrap_content"
-        android:textColor="@android:color/white"
-        android:layout_marginRight="10dp"
-        android:layout_gravity="right"
-        android:textSize="@dimen/text_size_details_page"
-        android:background="@color/colorAccent"
-        android:text="SAVE"
-        android:layout_height="wrap_content" />
+        <android.support.v7.widget.AppCompatEditText
+            android:id="@+id/mobilenumber"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_margin="@dimen/spacing"
+            android:inputType="text"
+            android:backgroundTint="@color/grey"
+            android:hint="@string/mobile"
+            android:text="@={addContactViewModel.phoneNumber}"
+            android:textColor="@color/grey"
+            android:textSize="@dimen/text_size_details_page" />
+
+        <android.support.v7.widget.AppCompatEditText
+            android:id="@+id/emailaddress"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:inputType="textEmailAddress"
+            android:layout_margin="@dimen/spacing"
+            android:backgroundTint="@color/grey"
+            android:hint="@string/email"
+            android:text="@={addContactViewModel.email}"
+            android:textColor="@color/grey"
+            android:textSize="@dimen/text_size_details_page" />
+
+        <android.support.v7.widget.AppCompatButton
+            android:id="@+id/savebutton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="right"
+            android:layout_marginRight="10dp"
+            android:background="@color/colorAccent"
+            android:text="SAVE"
+            android:onClick="@{addContactViewModel::onClickSave}"
+            android:textColor="@android:color/white"
+            android:textSize="@dimen/text_size_details_page" />
 
 
-
-</LinearLayout>
+    </LinearLayout>
+</layout>

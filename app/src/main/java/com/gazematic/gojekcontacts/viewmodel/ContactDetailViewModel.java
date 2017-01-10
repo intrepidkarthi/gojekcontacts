@@ -15,7 +15,7 @@ public class ContactDetailViewModel {
 
     private Contact contact;
 
-    public ContactDetailViewModel(Contact contact) {
+    public ContactDetailViewModel( Contact contact) {
         this.contact = contact;
     }
 
@@ -62,7 +62,6 @@ public class ContactDetailViewModel {
     public static void loadImage(ImageView view, String imageUrl) {
         Glide
                 .with(view.getContext())
-                //.placeholder(R.drawable.ic_person_24dp)
                 .load(imageUrl)
                 .error(R.drawable.ic_person_24dp)
                 .into(view);
