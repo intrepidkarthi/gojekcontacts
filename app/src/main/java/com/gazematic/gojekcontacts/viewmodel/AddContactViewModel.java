@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.databinding.BaseObservable;
 import android.util.Log;
 import android.view.View;
+import android.widget.Toast;
 
 import com.gazematic.gojekcontacts.Kontak;
 import com.gazematic.gojekcontacts.data.KontakAPIInterface;
@@ -78,9 +79,12 @@ public class AddContactViewModel extends BaseObservable{
     public void onClickSave(View view)
     {
         Contact userContact =  new Contact(contact.firstName, contact.lastName, contact.email, contact.phoneNumber, "", false, "2016-05-29T10:10:10.995Z", "2016-05-29T10:10:10.995Z" );
-        //String response = validateData(contact.firstName, contact.phoneNumber);
-        Log.v("Kontak", "onclick response: " + validateData(contact.firstName, contact.phoneNumber));
-        setContactDetails(userContact);
+        String validationResponse = validateData(contact.firstName, contact.phoneNumber);
+        //Todo: image upload in foreground need to be figured out
+        if(validationResponse.equals("Success"))
+            setContactDetails(userContact);
+        else
+            Toast.makeText(context, validationResponse, Toast.LENGTH_SHORT).show();
     }
 
 
@@ -112,8 +116,6 @@ public class AddContactViewModel extends BaseObservable{
                     if(response.code() >= 404)
                         Log.v("Kontak", "Error: " + response.errorBody().toString());
                 }
-
-                Log.v("Kontak", "getContactCall response: " + response.body());
             }
 
             @Override

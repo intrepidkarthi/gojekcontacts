@@ -7,8 +7,5 @@ import android.content.Context;
  */
 
 public interface AddContactViewModelContract {
-
   Context getContext();
-
-
 }

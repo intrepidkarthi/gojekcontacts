@@ -4,8 +4,6 @@ import android.content.Context;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.AppCompatButton;
-import android.support.v7.widget.AppCompatEditText;
 
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.gazematic.gojekcontacts.R;
@@ -26,16 +24,16 @@ public class AddContactActivity extends AppCompatActivity implements IPickResult
 
     @BindView(R.id.avatar)
     SimpleDraweeView userImage;
-    @BindView(R.id.firstname)
-    AppCompatEditText userFirstName;
-    @BindView(R.id.lastname)
-    AppCompatEditText userLastName;
-    @BindView(R.id.emailaddress)
-    AppCompatEditText userEmailAddress;
-    @BindView(R.id.mobilenumber)
-    AppCompatEditText userPhoneNumber;
-    @BindView(R.id.savebutton)
-    AppCompatButton userDataSaveButton;
+//    @BindView(R.id.firstname)
+//    AppCompatEditText userFirstName;
+//    @BindView(R.id.lastname)
+//    AppCompatEditText userLastName;
+//    @BindView(R.id.emailaddress)
+//    AppCompatEditText userEmailAddress;
+//    @BindView(R.id.mobilenumber)
+//    AppCompatEditText userPhoneNumber;
+//    @BindView(R.id.savebutton)
+//    AppCompatButton userDataSaveButton;
 
 
     AddContactViewModel addContactViewModel;
