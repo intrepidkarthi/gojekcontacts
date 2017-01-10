@@ -15,7 +15,6 @@ import android.support.v7.widget.AppCompatButton;
 import android.support.v7.widget.AppCompatTextView;
 import android.util.Log;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.ImageView;
 
 import com.gazematic.gojekcontacts.R;
@@ -92,38 +91,6 @@ public class DetailActivity extends AppCompatActivity implements ContactDetailVi
             @Override
             public void onFailure(Call<Contact> call, Throwable t) {
                 Log.v("Kontak", "getContactCall failure response: " + t.toString());
-            }
-        });
-
-
-        userPhone.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-            }
-        });
-
-        userEmail.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-            }
-        });
-
-
-        sendSMSButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-            }
-        });
-
-        shareContactButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-
-
             }
         });
 

@@ -45,12 +45,9 @@ public class AddContactViewModel extends BaseObservable{
         return contact.lastName;
     }
 
-
-
     public String getEmail() {
         return contact.email;
     }
-
 
     public String getPhoneNumber() {
         return contact.phoneNumber;
@@ -80,7 +77,7 @@ public class AddContactViewModel extends BaseObservable{
     {
         Contact userContact =  new Contact(contact.firstName, contact.lastName, contact.email, contact.phoneNumber, "", false, "2016-05-29T10:10:10.995Z", "2016-05-29T10:10:10.995Z" );
         String validationResponse = validateData(contact.firstName, contact.phoneNumber);
-        //Todo: image upload in foreground need to be figured out
+        //Todo: image upload in foreground
         if(validationResponse.equals("Success"))
             setContactDetails(userContact);
         else

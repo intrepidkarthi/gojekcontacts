@@ -45,5 +45,4 @@ public interface KontakAPIInterface {
   @PUT("contacts/{id}.json")
   Call<Contact> putContactsList(@Path("id") long contactId, @Body Contact contact);
 
-
 }

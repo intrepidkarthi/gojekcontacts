@@ -1,14 +1,10 @@
 package com.gazematic.gojekcontacts.view;
 
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
+import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.design.widget.CoordinatorLayout;
-import android.support.design.widget.Snackbar;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.AppCompatTextView;
 import android.text.TextUtils;
@@ -23,13 +19,14 @@ import android.widget.AdapterView;
 import android.widget.TextView;
 
 import com.gazematic.gojekcontacts.R;
-import com.gazematic.gojekcontacts.data.KontakAPIInterface;
-import com.gazematic.gojekcontacts.data.KontakFactory;
+import com.gazematic.gojekcontacts.databinding.ActivityMainBinding;
 import com.gazematic.gojekcontacts.model.Contact;
 import com.gazematic.gojekcontacts.utils.CircularContactView;
 import com.gazematic.gojekcontacts.utils.PinnedHeaderListView;
 import com.gazematic.gojekcontacts.utils.SearchablePinnedHeaderListViewAdapter;
 import com.gazematic.gojekcontacts.utils.StringArrayAlphabetIndexer;
+import com.gazematic.gojekcontacts.viewmodel.ContactsViewModel;
+import com.gazematic.gojekcontacts.viewmodel.ContactsViewModelContract;
 
 import net.redwarp.library.database.DatabaseHelper;
 
@@ -41,79 +38,36 @@ import java.util.Locale;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
 import static android.R.id.list;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements ContactsViewModelContract.MainView {
 
     private LayoutInflater inflater;
     private PinnedHeaderListView listView;
     private ContactsAdapter contactsAdapter;
-    private ArrayList<Contact> contacts;
+   // private ArrayList<Contact> contacts;
     @BindView(R.id.no_contacts)
     AppCompatTextView noContacts;
     DatabaseHelper helper;
     @BindView(R.id.layout_view)
     CoordinatorLayout coordinatorLayout;
-
+    ContactsViewModel contactsViewModel;
+    ActivityMainBinding activityMainBinding;
+    ContactsViewModelContract.MainView mainView = this;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         inflater = LayoutInflater.from(MainActivity.this);
-        setContentView(R.layout.activity_main);
+        activityMainBinding = DataBindingUtil.setContentView(this, R.layout.activity_main);
         ButterKnife.bind(this);
-
-
-        //Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        //setSupportActionBar(toolbar);
-
-        //Check Network connection
-        //This is faster than checking through HTTP socket in Retrofit
-        ConnectivityManager cm =
-                (ConnectivityManager) getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
-
-        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
-        boolean isConnected = activeNetwork != null &&
-                activeNetwork.isConnectedOrConnecting();
-
-        //Storing in DB
-        helper = new DatabaseHelper(getApplicationContext());
-
-
-        if (!isConnected)
-            Snackbar.make(coordinatorLayout, "Not able to connect to Server", Snackbar.LENGTH_SHORT).show();
-
-
-        Log.v("Kontak", "DB fetching event: " + helper.getCount(Contact.class));
-
-        if (helper.getCount(Contact.class) > 0) {
-
-            List<Contact> allContacts = helper.getAll(Contact.class);
-            for (int i = 0; i < allContacts.size(); i++) {
-                //Log.v("Kontak", "DB fetching event: counter" +allContacts.get(i).getFirstName());
-                contacts = new ArrayList<>(allContacts.size());
-                contacts.addAll(allContacts);
-
-                setContactsList();
-            }
-        } else {
-            if (isConnected)
-                makeAPICall();
-            else {
-                showRetryDialog();
-            }
-        }
-
-
+        ContactsViewModel contactsViewModel = new ContactsViewModel(mainView, getApplicationContext());
+        activityMainBinding.setContactsViewModel(contactsViewModel);
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu, menu);
         return true;
@@ -121,7 +75,6 @@ public class MainActivity extends AppCompatActivity {
 
 
     public boolean onOptionsItemSelected(MenuItem item) {
-
         //respond to menu item selection
         switch (item.getItemId()) {
             case R.id.add_new:
@@ -130,123 +83,20 @@ public class MainActivity extends AppCompatActivity {
             default:
                 return super.onOptionsItemSelected(item);
         }
-
-    }
-
-    public void showRetryDialog() {
-
-        final AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
-        builder.setCancelable(false);
-        builder.setTitle("");
-        builder.setCancelable(true);
-        builder.setMessage("Do you want to retry?");
-        builder.setPositiveButton("Retry", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int id) {
-                makeAPICall();
-            }
-        })
-                .setNegativeButton("Cancel ", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-
-                    }
-                });
-
-        // Create the AlertDialog object and return it
-        builder.create().show();
-    }
-
-    void setContactsList() {
-        //final ArrayList<Contact> contacts = getContacts();
-        Collections.sort(contacts, new Comparator<Contact>() {
-            @Override
-            public int compare(Contact lhs, Contact rhs) {
-                char lhsFirstLetter = TextUtils.isEmpty(lhs.getFirstName()) ? ' ' : lhs.getFirstName().charAt(0);
-                char rhsFirstLetter = TextUtils.isEmpty(rhs.getFirstName()) ? ' ' : rhs.getFirstName().charAt(0);
-                int firstLetterComparison = Character.toUpperCase(lhsFirstLetter) - Character.toUpperCase(rhsFirstLetter);
-                if (firstLetterComparison == 0)
-                    return lhs.getFirstName().compareTo(rhs.getFirstName());
-                return firstLetterComparison;
-            }
-        });
-        listView = (PinnedHeaderListView) findViewById(list);
-        contactsAdapter = new ContactsAdapter(contacts);
-
-        int pinnedHeaderBackgroundColor = getResources().getColor(R.color.pinned_header_text_bg);
-        contactsAdapter.setPinnedHeaderBackgroundColor(pinnedHeaderBackgroundColor);
-        contactsAdapter.setPinnedHeaderTextColor(getResources().getColor(R.color.pinned_header_text));
-        listView.setPinnedHeaderView(inflater.inflate(R.layout.pinned_header_listview_side_header, listView, false));
-        listView.setAdapter(contactsAdapter);
-        listView.setOnScrollListener(contactsAdapter);
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                Intent intent = new Intent(getApplicationContext(), DetailActivity.class);
-                intent.putExtra("id", contacts.get(i).getId());
-                startActivity(intent);
-                Log.v("Kontak", "listview item click: " + i);
-            }
-        });
-
-
     }
 
 
-    public void makeAPICall() {
-        KontakAPIInterface kontakAPIInterface =
-                KontakFactory.getClient().create(KontakAPIInterface.class);
-        //Get all contacts
-        Call<List<Contact>> getContactsCall = kontakAPIInterface.getContactsList();
-        getContactsCall.enqueue(new Callback<List<Contact>>() {
-            @Override
-            public void onResponse(Call<List<Contact>> call, Response<List<Contact>> response) {
-                Log.v("Kontak", "getContactsCall response: " + response.body());
 
 
-                if (response.body().size() == 0) {
-                    listView.setVisibility(View.INVISIBLE);
-                    noContacts.setVisibility(View.VISIBLE);
-                } else {
 
 
-                    //Retrieving from DB
-                    //List<Contact> myContacts = helper.getAll(Contact.class);
-                    contacts = new ArrayList<>(response.body().size());
-                    contacts.addAll(response.body());
 
-                    helper.beginTransaction();
-                    for (int i = 0; i < contacts.size(); i++)
-                        helper.save(contacts.get(i));
-                    //for (Contact myContact : contacts)
-                    //  helper.save(myContact);
-                    helper.setTransactionSuccessful();
-                    helper.endTransaction();
-
-                    Log.v("Kontak", "DB fetching event after insertion: " + helper.getCount(Contact.class));
-
-
-                    Log.v("Kontak", "I test response: " + contacts.get(0).getFirstName());
-                    //contacts = new ArrayList<Contact>(response.body());
-                    setContactsList();
-                }
-            }
-
-            @Override
-            public void onFailure(Call<List<Contact>> call, Throwable t) {
-                Log.v("Kontak", "getContactsCall failure response: " + t.toString());
-            }
-        });
-
-
-    }
 
 
     private class ContactsAdapter extends SearchablePinnedHeaderListViewAdapter<Contact> {
         private ArrayList<Contact> mContacts;
         private final int CONTACT_PHOTO_IMAGE_SIZE;
         private final int[] PHOTO_TEXT_BACKGROUND_COLORS;
-        //private final AsyncTaskThreadPool mAsyncTaskThreadPool = new AsyncTaskThreadPool(1, 2, 10);
 
         @Override
         public CharSequence getSectionTitle(int sectionIndex) {
@@ -281,11 +131,11 @@ public class MainActivity extends AppCompatActivity {
             if (convertView == null) {
                 holder = new ViewHolder();
                 rootView = inflater.inflate(R.layout.contact_listview_item, parent, false);
-                holder.friendProfileCircularContactView = (CircularContactView) rootView
-                        .findViewById(R.id.listview_item__friendPhotoImageView);
-                holder.friendProfileCircularContactView.getTextView().setTextColor(0xFFffffff);
-                holder.friendName = (TextView) rootView
-                        .findViewById(R.id.listview_item__friendNameTextView);
+                holder.profileCircularContactView = (CircularContactView) rootView
+                        .findViewById(R.id.listview_item__image);
+                holder.profileCircularContactView.getTextView().setTextColor(0xFFffffff);
+                holder.userName = (TextView) rootView
+                        .findViewById(R.id.listview_item__name);
                 holder.headerView = (TextView) rootView.findViewById(R.id.header_text);
                 rootView.setTag(holder);
             } else {
@@ -294,49 +144,17 @@ public class MainActivity extends AppCompatActivity {
             }
             final Contact contact = getItem(position);
             final String displayName = contact.getFirstName();
-            holder.friendName.setText(displayName);
-            //boolean hasPhoto = !TextUtils.isEmpty(contact.photoId);
-//            if (holder.updateTask != null && !holder.updateTask.isCancelled())
-//                holder.updateTask.cancel(true);
-//            final Bitmap cachedBitmap = hasPhoto ? ImageCache.INSTANCE.getBitmapFromMemCache(contact.photoId) : null;
-//            if (cachedBitmap != null)
-//                holder.friendProfileCircularContactView.setImageBitmap(cachedBitmap);
-//            else {
+            holder.userName.setText(displayName);
+
             final int backgroundColorToUse = PHOTO_TEXT_BACKGROUND_COLORS[position
                     % PHOTO_TEXT_BACKGROUND_COLORS.length];
             if (TextUtils.isEmpty(displayName))
-                holder.friendProfileCircularContactView.setImageResource(R.drawable.ic_person_24dp,
+                holder.profileCircularContactView.setImageResource(R.drawable.ic_person_24dp,
                         backgroundColorToUse);
             else {
                 final String characterToShow = TextUtils.isEmpty(displayName) ? "" : displayName.substring(0, 1).toUpperCase(Locale.getDefault());
-                holder.friendProfileCircularContactView.setTextAndBackgroundColor(characterToShow, backgroundColorToUse);
+                holder.profileCircularContactView.setTextAndBackgroundColor(characterToShow, backgroundColorToUse);
             }
-//                if (hasPhoto) {
-//                    holder.updateTask = new AsyncTaskEx<Void, Void, Bitmap>() {
-//
-//                        @Override
-//                        public Bitmap doInBackground(final Void... params) {
-//                            if (isCancelled())
-//                                return null;
-//                            final Bitmap b = ContactImageUtil.loadContactPhotoThumbnail(MainActivity.this, contact.photoId, CONTACT_PHOTO_IMAGE_SIZE);
-//                            if (b != null)
-//                                return ThumbnailUtils.extractThumbnail(b, CONTACT_PHOTO_IMAGE_SIZE,
-//                                        CONTACT_PHOTO_IMAGE_SIZE);
-//                            return null;
-//                        }
-//
-//                        @Override
-//                        public void onPostExecute(final Bitmap result) {
-//                            super.onPostExecute(result);
-//                            if (result == null)
-//                                return;
-//                            ImageCache.INSTANCE.addBitmapToCache(contact.photoId, result);
-//                            holder.friendProfileCircularContactView.setImageBitmap(result);
-//                        }
-//                    };
-//                    mAsyncTaskThreadPool.executeAsyncTask(holder.updateTask);
-//                }
-            //}
             bindSectionHeader(holder.headerView, null, position);
             return rootView;
         }
@@ -359,8 +177,47 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private static class ViewHolder {
-        public CircularContactView friendProfileCircularContactView;
-        TextView friendName, headerView;
-        //public AsyncTaskEx<Void, Void, Bitmap> updateTask;
+        public CircularContactView profileCircularContactView;
+        TextView userName, headerView;
+    }
+
+
+    @Override
+    public Context getContext() {
+        return MainActivity.this;
+    }
+
+    @Override
+    public void loadData(final ArrayList<Contact> contacts) {
+        //final ArrayList<Contact> contacts = getContacts();
+        Collections.sort(contacts, new Comparator<Contact>() {
+            @Override
+            public int compare(Contact lhs, Contact rhs) {
+                char lhsFirstLetter = TextUtils.isEmpty(lhs.getFirstName()) ? ' ' : lhs.getFirstName().charAt(0);
+                char rhsFirstLetter = TextUtils.isEmpty(rhs.getFirstName()) ? ' ' : rhs.getFirstName().charAt(0);
+                int firstLetterComparison = Character.toUpperCase(lhsFirstLetter) - Character.toUpperCase(rhsFirstLetter);
+                if (firstLetterComparison == 0)
+                    return lhs.getFirstName().compareTo(rhs.getFirstName());
+                return firstLetterComparison;
+            }
+        });
+        listView = (PinnedHeaderListView) findViewById(list);
+        contactsAdapter = new ContactsAdapter(contacts);
+
+        int pinnedHeaderBackgroundColor = getResources().getColor(R.color.pinned_header_text_bg);
+        contactsAdapter.setPinnedHeaderBackgroundColor(pinnedHeaderBackgroundColor);
+        contactsAdapter.setPinnedHeaderTextColor(getResources().getColor(R.color.pinned_header_text));
+        listView.setPinnedHeaderView(inflater.inflate(R.layout.pinned_header_listview_side_header, listView, false));
+        listView.setAdapter(contactsAdapter);
+        listView.setOnScrollListener(contactsAdapter);
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                Intent intent = new Intent(getApplicationContext(), DetailActivity.class);
+                intent.putExtra("id", contacts.get(i).getId());
+                startActivity(intent);
+                Log.v("Kontak", "listview item click: " + i);
+            }
+        });
     }
 }
