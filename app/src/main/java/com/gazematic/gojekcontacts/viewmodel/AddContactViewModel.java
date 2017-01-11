@@ -36,6 +36,10 @@ public class AddContactViewModel extends BaseObservable{
         this.context = context;
     }
 
+    public AddContactViewModel(Contact contact) {
+        this.contact = contact;
+    }
+
     public String getFirstName() {
         return contact.firstName;
     }

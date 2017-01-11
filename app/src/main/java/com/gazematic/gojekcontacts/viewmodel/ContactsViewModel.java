@@ -32,12 +32,16 @@ public class ContactsViewModel {
     private ContactsViewModelContract.MainView contactsViewModelContract;
     DatabaseHelper helper;
     private ArrayList<Contact> contacts;
+    KontakAPIInterface kontakAPIInterface;
+    public boolean isConnected;
 
     public ContactsViewModel(ContactsViewModelContract.MainView mainView, Context context) {
         contactsViewModelContract = mainView;
         this.context = context;
         initialChecks();
     }
+
+
 
     public void initialChecks()
     {
@@ -46,7 +50,7 @@ public class ContactsViewModel {
         ConnectivityManager cm =
                 (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
-        boolean isConnected = activeNetwork != null &&
+        isConnected = activeNetwork != null &&
                 activeNetwork.isConnectedOrConnecting();
 
         //Instantiate DB object
@@ -78,7 +82,7 @@ public class ContactsViewModel {
     }
 
     public void makeAPICall() {
-        KontakAPIInterface kontakAPIInterface =
+        kontakAPIInterface =
                 KontakFactory.getClient().create(KontakAPIInterface.class);
         //Get all contacts
         Call<List<Contact>> getContactsCall = kontakAPIInterface.getContactsList();
