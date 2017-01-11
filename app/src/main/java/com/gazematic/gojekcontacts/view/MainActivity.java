@@ -86,13 +86,6 @@ public class MainActivity extends AppCompatActivity implements ContactsViewModel
     }
 
 
-
-
-
-
-
-
-
     private class ContactsAdapter extends SearchablePinnedHeaderListViewAdapter<Contact> {
         private ArrayList<Contact> mContacts;
         private final int CONTACT_PHOTO_IMAGE_SIZE;

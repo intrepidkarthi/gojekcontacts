@@ -41,9 +41,14 @@ dependencies {
     compile 'com.squareup.okhttp3:logging-interceptor:3.3.1'
     compile 'com.jakewharton:butterknife:8.4.0'
     compile 'com.android.support:design:25.0.0'
-    testCompile 'junit:junit:4.12'
     annotationProcessor 'com.jakewharton:butterknife-compiler:8.4.0'
     compile 'com.github.jrvansuita:PickImage:v2.0.0'
     compile 'net.redwarp.android.library:lazy-database:0.2.2'
+
+    // Required -- JUnit 4 framework
+    testCompile 'junit:junit:4.12'
+    // Optional -- Mockito framework
+    testCompile 'org.mockito:mockito-core:1.10.19'
+    androidTestCompile 'com.android.support.test.espresso:espresso-core:2.2.2'
 
 }

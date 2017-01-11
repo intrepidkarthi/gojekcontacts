@@ -47,6 +47,10 @@ public class ContactDetailViewModel {
         this.contact = contact;
     }
 
+    public ContactDetailViewModel(Contact contact) {
+        this.contact = contact;
+    }
+
     public long getId() {
         return contact.id;
     }
@@ -84,6 +88,14 @@ public class ContactDetailViewModel {
         return contact.phoneNumber;
     }
 
+    public String getCreatedAt() {
+        return contact.createdAt;
+    }
+
+    public String getUpdatedAt() {
+        return contact.updatedAt;
+    }
+
 
     public String getProfilePic() {
         return contact.profilePic;
@@ -105,7 +117,7 @@ public class ContactDetailViewModel {
 
     public void onClickPhone(View view)
     {
-//Callphone directly
+        //Callphone directly
         Intent i = new Intent(Intent.ACTION_CALL);
         i.setData(Uri.parse("tel:" + getPhoneNumber().trim()));
         if (ActivityCompat.checkSelfPermission(context, Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
