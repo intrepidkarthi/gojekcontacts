@@ -19,6 +19,7 @@ public class Kontak extends Application {
 
     public void onCreate() {
         super.onCreate();
+        //Fresco lib initialization
         ImagePipelineConfig config = ImagePipelineConfig.newBuilder(this)
                 .setDownsampleEnabled(true)
                 .setResizeAndRotateEnabledForNetwork(true)
